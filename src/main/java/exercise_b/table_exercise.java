@@ -52,33 +52,22 @@
 
 	    // Find search and return column indices
 	    WebElement headersRow = table.findElement(By.tagName("thead")).findElement(By.tagName("tr"));
-	    for (WebElement header : headersRow.findElements(By.tagName("th"))) {
-	      String headerText = header.getText().trim();
-	      if (headerText.equals(searchText)) {
-	        searchRowIndex = 0;
-	        searchColumn = headersRow.findElements(By.tagName("th")).indexOf(header);
-	      } else if (headerText.equals(Integer.toString(returnColumnText))) {
-	        returnColumnIndex = headersRow.findElements(By.tagName("th")).indexOf(header);
+		  for (WebElement header : headersRow.findElements(By.tagName("th"))) {
+			  String headerText = header.getText().trim();
+			  if (headerText.equals(Integer.toString(searchColumn + 1))) {
+				  searchColumn = headersRow.findElements(By.tagName("th")).indexOf(header);
+			  } else if (headerText.equals(Integer.toString(returnColumn + 1))) {
+				  returnColumnIndex = headersRow.findElements(By.tagName("th")).indexOf(header);
 	      }
 	    }
 
-	    // Find search value in table and return text from return column
-	    for (WebElement row : table.findElement(By.tagName("tbody")).findElements(By.tagName("tr"))) {
-	      if (searchRowIndex == -1) {
-	        searchRowIndex = 0;
-	      } else {
-	        searchRowIndex++;
-	      }
+		  // Find search value in table using XPath and return text from return column
+		  String cellText = table.findElement(By.xpath("//td[" + (searchColumn + 1) + "][contains(text(), '" + searchText + "')]"))
+				  .findElement(By.xpath("../td[" + (returnColumnIndex + 1) + "]")).getText().trim();
 
-	      WebElement cell = row.findElements(By.tagName("td")).get(searchColumn);
-	      if (cell.getText().trim().equals(searchText)) {
-	        return row.findElements(By.tagName("td")).get(returnColumnIndex).getText().trim();
-	      }
-	    }
-
-	    return null;
+		  return cellText;
 	  }
-	  
+
 	  public static boolean verifyTableCellText(WebElement table, int searchColumn, String searchText,
 	      int returnColumnText, String expectedText) {
 	    String actualText = getTableCellText(table, searchColumn, searchText, returnColumnText);
